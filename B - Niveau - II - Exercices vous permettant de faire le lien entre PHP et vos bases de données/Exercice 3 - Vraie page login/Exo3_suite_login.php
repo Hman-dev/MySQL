@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
+    <title> Page de Connexion</title>
 </head>
 <body>
-<div class="align-center">
+<div align="center">
 <h1>Connexion Utilisateur</h1>
 <form action="Exo3_suite_login.php" method ="post">
     <label>Email :</label>
@@ -30,7 +30,7 @@ if(isset($_POST["envoyer"])){
         $base = new PDO('mysql:host=localhost;dbname=niveau2;charset=utf8', 'root', '');
 
         $login = htmlspecialchars($_POST['utilisateur']);
-        $mdp =$_POST['mdp'];
+        $mdp = $_POST['mdp'];
         date_default_timezone_set('Europe/Paris');
         setlocale(LC_TIME,"fr_FR.UTF-8", "French_France.1252");
         $date = date('Y-m-d H:i:s');
@@ -41,34 +41,31 @@ if(isset($_POST["envoyer"])){
         // var_dump ($loginexist);
 
         if($loginexist != false ){
+
             $hash = $loginexist['motdepasse'];
             $result = password_verify($mdp,$hash);
+             
+
             if($result){
-                echo ("login réussi !");
-            }else{
-                echo("mauvais mot de passe");
+                echo ("<font color='red'>login réussi !");
+                $_SESSION['utilisateur'] = $loginexist['email'];
+                header("location:home.php?utilisateur=".$_SESSION['utilisateur']); /* la fonction header location va rediriger
+                 l'utilisateur vers sa session home.php 
+                 */
+                $base = new PDO('mysql:host=localhost;dbname=niveau2;charset=utf8', 'root', '');
+                $sql = "INSERT INTO connexions(login,PASSWORD,heure_connexion) VALUES('$login','$result', '$date')";
+                $base -> query($sql);
+            
+                echo $sql."<br><br>";
+            }
+            else{
+                echo("<div align='center'><p><font color='red'>Les idendtifiants que vous avez tapé sont incorrectes !</p></div>");
             }
 
-            /*$base = new PDO('mysql:host=localhost;dbname=niveau2;charset=utf8', 'root', '');  
-            $sql = "INSERT INTO connexions(login,PASSWORD, heure_connexion) VALUES('$login','$mdp', '$date')"; 
-            $base->query($sql);
-            echo $sql;*/
-
-           /*/ $search = $base->prepare("SELECT * FROM utilisateur WHERE email=?");
-            $search ->execute([$login]);
-            $loginexist = $search->fetch();*/
-            
-
-
-            /*if($loginexist && (password_verify($_POST['mdp']),$loginexist['motdepasse'])){
-                echo ("Votre mot de passe est valides !");
-            }else{
-                echo("<font color="red">Votre mot de passe est invalid ");
-
-            }*/
+           
 
         }else{
-            echo ("Mauvais mail ou mot de passe !<br/><br/>");
+            echo ('<body onLoad="alert(\'Membre non reconnu, Veuillez rentrer tous les champs merci!\')">');
         }
 
 
